@@ -1,0 +1,169 @@
+# app.py
+# app.py
+from flask import Flask, render_template, request, redirect
+import psycopg
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
+
+app = Flask(__name__)
+
+# Database configuration from environment variables
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+
+# Global database connection
+def get_db():
+    return psycopg.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS,
+        host=DB_HOST,
+        port=DB_PORT
+    )
+
+@app.route('/')
+def list_employees():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM employees")
+    employees = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template('list.html', employees=employees)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add_employee():
+    if request.method == 'POST':
+        name = request.form['name']
+        age = request.form['age']
+        
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO employees (name, age) VALUES (%s, %s)", (name, age))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return redirect('/')
+    return render_template('add.html')
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_employee(id):
+    if request.method == 'POST':
+        name = request.form['name']
+        age = request.form['age']
+        
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("UPDATE employees SET name = %s, age = %s WHERE id = %s", (name, age, id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return redirect('/')
+    
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM employees WHERE id = %s", (id,))
+    employee = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    return render_template('edit.html', employee=employee)
+
+@app.route('/delete/<int:id>')
+def delete_employee(id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM employees WHERE id = %s", (id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect('/')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# hello.py
+def main():
+    print("Hello from emp1!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+# add.html
+<!-- add.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Employee</title>
+</head>
+<body>
+    <h1>Add New Employee</h1>
+    <form method="POST">
+        <p>Name: <input type="text" name="name"></p>
+        <p>Age: <input type="number" name="age"></p>
+        <p><input type="submit" value="Add Employee"></p>
+    </form>
+    <a href="/">Back to List</a>
+</body>
+</html>
+
+# edit.html
+<!-- edit.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Employee</title>
+</head>
+<body>
+    <h1>Edit Employee</h1>
+    <form method="POST">
+        <p>Name: <input type="text" name="name" value="{{ employee[1] }}"></p>
+        <p>Age: <input type="number" name="age" value="{{ employee[2] }}"></p>
+        <p><input type="submit" value="Update Employee"></p>
+    </form>
+    <a href="/">Back to List</a>
+</body>
+</html>
+
+# list.html
+<!-- list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employees List</title>
+</head>
+<body>
+    <h1>Employees</h1>
+    <a href="/add">Add New Employee</a>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+        {% for employee in employees %}
+        <tr>
+            <td>{{ employee[0] }}</td>
+            <td>{{ employee[1] }}</td>
+            <td>{{ employee[2] }}</td>
+            <td>
+                <a href="/edit/{{ employee[0] }}">Edit</a>
+                <a href="/delete/{{ employee[0] }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+

@@ -1,0 +1,17 @@
+Create a Golang function that:
+Takes a directory path as an input parameter.
+If the path is empty string , path should be read from LEGACY_CODE_PATH in the .env file
+
+Recursively traverses through:
+The specified directory
+All its subdirectories
+ONLY the *.py and *.html files in these directories
+ignore any subdirectories with .venv
+
+Build a long combined string with:
+- file name as "# <filename>"
+- file's contents
+- write it all to single output.txt file
+
+This contents of this output.txt file should contain all *.py and *.html file contents.
+

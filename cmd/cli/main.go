@@ -1,35 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
-
-	"lcma/internal/ai"
+	"lcma/internal/config"
+	"lcma/internal/utils"
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
-	client := ai.NewGroqClient(os.Getenv("GROQ_API_KEY"))
-	model := os.Getenv("MODEL")
-
-	messages := []ai.GroqMessage{
-		{
-			Role:    "user",
-			Content: "Explain the importance of fast language models",
-		},
-	}
-
-	response, err := client.CreateChatCompletion(model, messages)
+	err := config.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Print the response
-	fmt.Println(response.Choices[0].Message.Content)
+	// utils.GenerateLegacyCodeContext()
+	// utils.CallLLM("Who is the president of the United States?")
+	err = utils.CallLLMWithContextAndSaveReport()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
