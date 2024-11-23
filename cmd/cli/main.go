@@ -16,6 +16,7 @@ func main() {
 		log.Fatal(err)
 	}
 	client := ai.NewGroqClient(os.Getenv("GROQ_API_KEY"))
+	model := os.Getenv("MODEL")
 
 	messages := []ai.GroqMessage{
 		{
@@ -24,7 +25,7 @@ func main() {
 		},
 	}
 
-	response, err := client.CreateChatCompletion("llama3-8b-8192", messages)
+	response, err := client.CreateChatCompletion(model, messages)
 	if err != nil {
 		log.Fatal(err)
 	}
