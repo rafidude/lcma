@@ -1,0 +1,27 @@
+Please analyze the legacy codebase provided between the <legacy_code> tags. 
+The legacy application represents a database-driven web application with legacy tech stack provided between the <legacytech_stack> tags.
+
+Legacy Tech stack:
+<legacytech_stack></legacytech_stack>
+
+Legacy code:
+<legacy_code></legacy_code>
+
+1. High-Level Documentation of the legacy codebase included in legacy_code based on legacytech_stack tag based tech stack.
+   - Architecture overview and main components
+   - Key business logic and workflows
+   - Database schema and relationships
+   - External dependencies and integrations
+   - information in Markdown format
+
+2. Technical Debt & Potential Issues with the legacy codebase included in legacy_code tags based on legacytech_stack tag based tech stack.
+   - Security vulnerabilities
+   - Performance bottlenecks
+   - Maintainability concerns
+   - Outdated dependencies or deprecated features
+   - Missing error handling or edge cases
+   - Code smells and anti-patterns
+   - information in Markdown format
+
+3. Give the project file structure needs be output in the JSON format
+   - output this specific section in JSON format ONLY

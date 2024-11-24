@@ -1,0 +1,26 @@
+Please analyze the legacy codebase provided between the <legacy_code>  tags. 
+The legacy application represents a database-driven web application with legacy tech stack provided between the <legacytech_stack> tags.
+
+Legacy Tech stack:
+<legacytech_stack></legacytech_stack>
+
+Legacy code:
+<legacy_code></legacy_code>
+
+Target Technology Stack:
+<moderntech_stack></moderntech_stack>
+
+# Modern Implementation
+   Please rewrite the application using the modern technology stack specified in the <moderntech_stack> tags, focusing on:
+   - Referencing the code in legacy_code tags, implement ONLY code using moderntech_stack
+   - Ignore all the UI code in legacy_ui tags, because that is handled elsewhere
+   - Do NOT add any text. The output is ONLY code in code blocks
+   - Modern best practices and design patterns
+   - Improved security and error handling
+   - Better performance and scalability
+   - Clean architecture principles
+   - Type safety and input validation
+   - Comprehensive testing strategy
+   - Documentation and maintainability
+   - Make sure the whole code is provided for all the code files with full implementation
+

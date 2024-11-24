@@ -2,30 +2,22 @@ package utils
 
 import (
 	"fmt"
-	"log"
+	"lcma/internal/config"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/joho/godotenv"
 )
 
 // ReadDirectoryFiles reads all .py and .html files from the given directory
 // and its subdirectories, combining their contents into a single output file
-func readDirectoryFiles(dirPath string) error {
+func ReadLegacyCodeGenerateOutput(dirPath string) error {
 	// If dirPath is empty, read from env
 	if dirPath == "" {
-		if err := godotenv.Load(); err != nil {
-			return fmt.Errorf("error loading .env file: %w", err)
-		}
-		dirPath = os.Getenv("LEGACY_CODE_PATH")
-		if dirPath == "" {
-			return fmt.Errorf("LEGACY_CODE_PATH not set in .env file")
-		}
+		dirPath = config.LegacyCodePath
 	}
 
 	// Create/truncate output file
-	outputFile, err := os.Create("output.txt")
+	outputFile, err := os.Create(config.OutputFilePath)
 	if err != nil {
 		return fmt.Errorf("error creating output file: %w", err)
 	}
@@ -80,11 +72,4 @@ func readDirectoryFiles(dirPath string) error {
 	}
 
 	return nil
-}
-
-func GenerateLegacyCodeContext() {
-	err := readDirectoryFiles("") // will read from .env
-	if err != nil {
-		log.Fatal(err)
-	}
 }

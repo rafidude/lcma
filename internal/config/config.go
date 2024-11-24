@@ -14,7 +14,7 @@ var (
 	LegacyTechStack    string
 	ModernTechStack    string
 	PromptTemplatePath string
-	OutputPath         string
+	OutputFilePath     string
 	ReportPath         string
 	ModernCodePath     string
 )
@@ -57,9 +57,9 @@ func Init() error {
 		return fmt.Errorf("PROMPT_TEMPLATE_PATH not set in .env file")
 	}
 
-	OutputPath = os.Getenv("OUTPUT_PATH")
-	if OutputPath == "" {
-		return fmt.Errorf("OUTPUT_PATH not set in .env file")
+	OutputFilePath = os.Getenv("OUTPUT_FILE_PATH")
+	if OutputFilePath == "" {
+		return fmt.Errorf("OUTPUT_FILE_PATH not set in .env file")
 	}
 
 	ReportPath = os.Getenv("REPORT_PATH")
