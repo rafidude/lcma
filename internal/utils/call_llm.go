@@ -42,10 +42,6 @@ func CallLLMWithContextAndSaveReport() error {
 			promptFile: "prompt_code.txt",
 			reportFile: "report_code.md",
 		},
-		{
-			promptFile: "prompt_ui.txt",
-			reportFile: "report_ui.md",
-		},
 	}
 
 	outputFile, err := os.ReadFile(config.OutputFilePath)
@@ -64,7 +60,7 @@ func CallLLMWithContextAndSaveReport() error {
 			return fmt.Errorf("failed to build prompt for %s: %w", promptPath, err)
 		}
 
-		prompt += "\n\n<legacy_code>\n" + string(outputFile) + "\n</legacy_code>"
+		prompt = "\nLegacy Code:\n<legacy_code>\n" + string(outputFile) + "\n</legacy_code>\n\n" + prompt
 
 		// Call LLM with the constructed prompt
 		response, err := CallLLM(prompt)

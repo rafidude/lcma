@@ -4,9 +4,6 @@ The legacy application represents a database-driven web application with legacy 
 Legacy Tech stack:
 <legacytech_stack></legacytech_stack>
 
-Legacy code:
-<legacy_code></legacy_code>
-
 1. High-Level Documentation of the legacy codebase included in legacy_code based on legacytech_stack tag based tech stack.
    - Architecture overview and main components
    - Key business logic and workflows
@@ -22,6 +19,3 @@ Legacy code:
    - Missing error handling or edge cases
    - Code smells and anti-patterns
    - information in Markdown format
-
-3. Give the project file structure needs be output in the JSON format
-   - output this specific section in JSON format ONLY

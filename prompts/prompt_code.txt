@@ -4,16 +4,18 @@ The legacy application represents a database-driven web application with legacy 
 Legacy Tech stack:
 <legacytech_stack></legacytech_stack>
 
-Legacy code:
-<legacy_code></legacy_code>
-
-Target Technology Stack:
+Target OR Modern Technology Stack:
 <moderntech_stack></moderntech_stack>
 
-# Modern Implementation
+# Project Code Structure
+   Give the project file structure for the new stack given in moderntech_stack tags. 
+   - output this specific section in JSON format ONLY starting with ```json
+
+# Modern Code & UI Implementation
    Please rewrite the application using the modern technology stack specified in the <moderntech_stack> tags, focusing on:
-   - Referencing the code in legacy_code tags, implement ONLY code using moderntech_stack
-   - Ignore all the UI code in legacy_ui tags, because that is handled elsewhere
+   - Do NOT create any tests or test files
+   - Referencing the code in legacy_code tags, implement functionality using moderntech_stack
+   - Implement BOTH the Code & UI implement functionality using moderntech_stack
    - Do NOT add any text. The output is ONLY code in code blocks
    - Modern best practices and design patterns
    - Improved security and error handling
@@ -23,4 +25,5 @@ Target Technology Stack:
    - Comprehensive testing strategy
    - Documentation and maintainability
    - Make sure the whole code is provided for all the code files with full implementation
+   - Make sure the whole code is provided for all the UI files with full implementation
 
