@@ -32,8 +32,6 @@ func CallLLMWithContextAndSaveReport() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Prompt: \n", prompt)
-
 	response, err := CallLLM(prompt)
 	if err != nil {
 		return err

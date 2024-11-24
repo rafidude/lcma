@@ -1,364 +1,392 @@
-Legacy Codebase Documentation
-==========================
+**High-Level Documentation of the Legacy Codebase**
+=====================================================
 
 ### Architecture Overview and Main Components
 
-The legacy codebase is built using Flask, a micro web framework written in Python. The application consists of several key components:
+The legacy codebase is a Flask-based web application built using Python, HTML, CSS, and JavaScript. The main components include:
 
-1.  **Routes**: The application defines several routes for listing employees, adding new employees, editing existing employees, and deleting employees.
-2.  **Database Interactions**: The application uses the `psycopg` library to interact with a PostgreSQL database. Database operations are performed using raw SQL queries.
-3.  **Templates**: The application uses Jinja2 templates for rendering HTML templates.
-4.  **Static Files**: The application serves static files directly.
+* **Database**: A PostgreSQL database is used to store employee data.
+* **Web Framework**: Flask is used as the web framework to handle HTTP requests and responses.
+* **Templates**: HTML templates are used to render the user interface.
+* **Static Assets**: CSS and JavaScript files are used for styling and client-side logic.
 
 ### Key Business Logic and Workflows
 
-1.  **Employee Listing**: The application retrieves a list of employees from the database and displays them in a table.
-2.  **Employee Creation**: The application accepts user input for employee name and age, validates the input, and inserts the new employee into the database.
-3.  **Employee Editing**: The application retrieves an existing employee from the database, accepts user input for updated employee details, and updates the employee record in the database.
-4.  **Employee Deletion**: The application accepts an employee ID, retrieves the corresponding employee record from the database, and deletes the record.
+The application provides CRUD (Create, Read, Update, Delete) functionality for employee data:
+
+* **List Employees**: The application lists all employees in a table on the main page.
+* **Add Employee**: A new employee can be added by submitting a form with name and age.
+* **Edit Employee**: An existing employee's details can be updated by submitting a form with the new details.
+* **Delete Employee**: An employee can be deleted by clicking a delete button.
 
 ### Database Schema and Relationships
 
-The database schema consists of a single table named `employees` with the following columns:
+The database schema consists of a single table called `employees` with the following columns:
 
 | Column Name | Data Type |
-| :--------- | :------- |
-| id         | integer   |
-| name       | varchar   |
-| age        | integer   |
+|-------------|-----------|
+| id | SERIAL PRIMARY KEY |
+| name | VARCHAR(50) |
+| age | INTEGER |
 
-There are no explicit relationships defined between tables in the database schema.
+There are no relationships between tables in this simple schema.
 
 ### External Dependencies and Integrations
 
-The application depends on the following external libraries:
+The application uses the following external dependencies:
 
-1.  `Flask` for building the web application
-2.  `psycopg` for interacting with the PostgreSQL database
-3.  `dotenv` for loading environment variables from a `.env` file
+* **psycopg**: A PostgreSQL database driver for Python.
+* **Flask**: A web framework for Python.
+* **dotenv**: A library for loading environment variables from a `.env` file.
 
-Technical Debt and Potential Issues
-=====================================
+**Technical Debt & Potential Issues with the Legacy Codebase**
+=============================================================
 
 ### Security Vulnerabilities
 
-1.  **SQL Injection**: The application uses raw SQL queries, which makes it vulnerable to SQL injection attacks.
-2.  **Cross-Site Scripting (XSS)**: The application does not perform input validation or sanitization for user input, making it vulnerable to XSS attacks.
+* **SQL Injection**: The application is vulnerable to SQL injection attacks due to the use of string formatting for query construction.
+* **XSS**: The application is vulnerable to cross-site scripting (XSS) attacks due to the use of unsanitized user input.
 
 ### Performance Bottlenecks
 
-1.  **Database Connection**: The application establishes a new database connection for each request, which can lead to performance issues under high load.
-2.  **Query Optimization**: The application uses simple queries that may not be optimized for performance.
+* **Database Queries**: The application executes multiple database queries for each request, leading to potential performance bottlenecks.
+* **Template Rendering**: The application uses a simple template rendering engine, which may lead to slower performance compared to more advanced engines.
 
 ### Maintainability Concerns
 
-1.  **Code Organization**: The application code is not organized into separate modules or packages, making it difficult to maintain.
-2.  **Lack of Comments**: The application code does not include comments or documentation, making it difficult for new developers to understand the codebase.
+* **Tight Coupling**: The application's logic is tightly coupled to the database and web framework, making it harder to maintain and test.
+* **Lack of Separation of Concerns**: The application does not separate concerns, such as business logic, data access, and presentation logic.
 
 ### Outdated Dependencies or Deprecated Features
 
-1.  **Flask Version**: The application uses an outdated version of Flask, which may not include the latest security patches and features.
-2.  **psycopg Version**: The application uses an outdated version of psycopg, which may not include the latest security patches and features.
+* **psycopg**: The `psycopg` library is outdated and may not support the latest PostgreSQL features.
+* **Flask**: Flask is still a widely used framework, but some features may be deprecated or superseded by newer versions.
 
 ### Missing Error Handling or Edge Cases
 
-1.  **Database Errors**: The application does not handle database errors, which can lead to unexpected behavior or crashes.
-2.  **Input Validation**: The application does not perform input validation, which can lead to unexpected behavior or crashes.
+* **Error Handling**: The application does not handle errors properly, leading to potential crashes or unexpected behavior.
+* **Edge Cases**: The application does not handle edge cases, such as invalid user input or database errors.
 
 ### Code Smells and Anti-Patterns
 
-1.  **Global Database Connection**: The application uses a global database connection, which can lead to performance issues and make the code harder to maintain.
+* **Duplicate Code**: The application contains duplicate code in multiple places.
+* **Magic Numbers**: The application uses magic numbers, which make the code harder to understand.
 
-Modern Implementation
-====================
+**Modern Implementation**
+=====================
 
-### Project Structure
+### Project File Structure
 
-The modern implementation will follow the standard Go project structure:
-```markdown
-project/
-├── cmd/
-│   └── main.go
-├── internal/
-│   ├── database/
-│   │   └── employees.go
-│   ├── handlers/
-│   │   ├── employees.go
-│   │   └── index.go
-│   └── models/
-│       └── employee.go
-├── pkg/
-│   └── utils/
-│       └── error.go
-├── public/
-├── templates/
-│   ├── employees.html
-│   ├── index.html
-│   └── layout.html
-├── tests/
-├── vendor/
-├── go.mod
-├── go.sum
-└── main.go
-```
-
-### Database Configuration
-
-We will use the `sqlx` package to interact with the database. We will define a `database` package that exports a `DB` struct, which will be used to access the database.
-```go
-// internal/database/employees.go
-package database
-
-import (
-	"database/sql"
-	"fmt"
-
-	"example.com/project/internal/models"
-
-	"github.com/jmoiron/sqlx"
-)
-
-type DB struct {
-	*sqlx.DB
-}
-
-func NewDB(connection string) (*DB, error) {
-	db, err := sqlx.Connect("postgres", connection)
-	if err != nil {
-		return nil, err
-	}
-
-	return &DB{db}, nil
-}
-
-func (db *DB) GetEmployees() ([]models.Employee, error) {
-	employees := []models.Employee{}
-
-	err := db.Select(&employees, "SELECT * FROM employees")
-	if err != nil {
-		return nil, err
-	}
-
-	return employees, nil
-}
-
-func (db *DB) CreateEmployee(employee *models.Employee) error {
-	_, err := db.NamedExec("INSERT INTO employees (name, age) VALUES (:name, :age)", employee)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *DB) UpdateEmployee(employee *models.Employee) error {
-	_, err := db.NamedExec("UPDATE employees SET name = :name, age = :age WHERE id = :id", employee)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (db *DB) DeleteEmployee(id int) error {
-	_, err := db.Exec("DELETE FROM employees WHERE id = $1", id)
-	if err != nil {
-		return err
-	}
-
-	return nil
+```json
+{
+  "dir": "employees",
+  "files": [
+    "main.go",
+    "models",
+    "repositories",
+    "services",
+    "handlers",
+    "templates",
+    "public",
+    "go.mod",
+    "go.sum"
+  ],
+  "models": [
+    "employee.go"
+  ],
+  "repositories": [
+    "employee_repository.go"
+  ],
+  "services": [
+    "employee_service.go"
+  ],
+  "handlers": [
+    "employee_handler.go"
+  ],
+  "templates": [
+    "base.html",
+    "list.html",
+    "add.html",
+    "edit.html"
+  ],
+  "public": [
+    "index.html",
+    "styles.css",
+    "script.js"
+  ]
 }
 ```
 
-### HTTP Handlers
+### Modern Implementation using Golang, Chi, HTMX, and Tailwind
 
-We will use the `chi` package to define HTTP handlers. We will define a `handlers` package that exports an `EmployeesHandler` struct, which will be used to handle HTTP requests.
+Below is the modern implementation of the application using the specified technology stack:
+
+**main.go**
 ```go
-// internal/handlers/employees.go
-package handlers
-
-import (
-	"encoding/json"
-	"net/http"
-
-	"example.com/project/internal/database"
-	"example.com/project/internal/models"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-)
-
-type EmployeesHandler struct {
-	db *database.DB
-}
-
-func NewEmployeesHandler(db *database.DB) *EmployeesHandler {
-	return &EmployeesHandler{db}
-}
-
-func (h *EmployeesHandler) GetEmployees(w http.ResponseWriter, r *http.Request) {
-	employees, err := h.db.GetEmployees()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(employees)
-}
-
-func (h *EmployeesHandler) CreateEmployee(w http.ResponseWriter, r *http.Request) {
-	var employee models.Employee
-	err := json.NewDecoder(r.Body).Decode(&employee)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err = h.db.CreateEmployee(&employee)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-}
-
-func (h *EmployeesHandler) UpdateEmployee(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var employee models.Employee
-	err = json.NewDecoder(r.Body).Decode(&employee)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err = h.db.UpdateEmployee(&employee)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-}
-
-func (h *EmployeesHandler) DeleteEmployee(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err = h.db.DeleteEmployee(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-```
-
-### Main Function
-
-We will define a `main` function that creates a new instance of the `EmployeesHandler` struct and defines the HTTP routes.
-```go
-// main.go
 package main
 
 import (
-	"fmt"
-	"log"
+    "github.com/go-chi/chi/v5"
+    "github.com/go-chi/chi/v5/middleware"
+    "github.com/htmx.org/htmx-go/v2"
+    "net/http"
 
-	"example.com/project/internal/database"
-	"example.com/project/internal/handlers"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+    "employees/handlers"
+    "employees/middleware"
 )
 
 func main() {
-	db, err := database.NewDB("user:password@localhost/database")
-	if err != nil {
-		log.Fatal(err)
-	}
+    router := chi.NewRouter()
+    router.Use(middleware.Context)
+    router.Use(htmx.HtmxMiddleware)
 
-	handler := handlers.NewEmployeesHandler(db)
+    employeeHandler := handlers.EmployeeHandler{}
 
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+    router.Get("/", employeeHandler.GetAll)
+    router.Get("/add", employeeHandler.Add)
+    router.Post("/add", employeeHandler.Create)
+    router.Get("/edit/{id}", employeeHandler.Edit)
+    router.Post("/edit/{id}", employeeHandler.Update)
+    router.Delete("/delete/{id}", employeeHandler.Delete)
 
-	r.Get("/employees", handler.GetEmployees)
-	r.Post("/employees", handler.CreateEmployee)
-	r.Put("/employees/{id}", handler.UpdateEmployee)
-	r.Delete("/employees/{id}", handler.DeleteEmployee)
-
-	fmt.Println("Server started on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+    http.ListenAndServe(":8080", router)
 }
 ```
 
-### templates
+**models/employee.go**
+```go
+package models
 
-We will use the `HTMX` package to define HTML templates. We will define a `layout.html` template that includes a navigation bar and a `content` block.
+import (
+    "database/sql"
+    "errors"
+)
+
+type Employee struct {
+    ID   int    `json:"id"`
+    Name string `json:"name"`
+    Age  int    `json:"age"`
+}
+
+func (e *Employee) GetID() int {
+    return e.ID
+}
+
+func (e *Employee) GetName() string {
+    return e.Name
+}
+
+func (e *Employee) GetAge() int {
+    return e.Age
+}
+```
+
+**repositories/employee_repository.go**
+```go
+package repositories
+
+import (
+    "database/sql"
+    "employees/models"
+    "errors"
+)
+
+type EmployeeRepository struct {
+    db *sql.DB
+}
+
+func NewEmployeeRepository(db *sql.DB) *EmployeeRepository {
+    return &EmployeeRepository{db: db}
+}
+
+func (e *EmployeeRepository) GetAll() ([]models.Employee, error) {
+    rows, err := e.db.Query("SELECT * FROM employees")
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var employees []models.Employee
+    for rows.Next() {
+        var employee models.Employee
+        err := rows.Scan(&employee.ID, &employee.Name, &employee.Age)
+        if err != nil {
+            return nil, err
+        }
+        employees = append(employees, employee)
+    }
+    return employees, nil
+}
+
+func (e *EmployeeRepository) Create(employee models.Employee) error {
+    _, err := e.db.Exec("INSERT INTO employees (name, age) VALUES ($1, $2)", employee.Name, employee.Age)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (e *EmployeeRepository) Edit(id int) (models.Employee, error) {
+    row := e.db.QueryRow("SELECT * FROM employees WHERE id = $1", id)
+    var employee models.Employee
+    err := row.Scan(&employee.ID, &employee.Name, &employee.Age)
+    if err != nil {
+        return models.Employee{}, err
+    }
+    return employee, nil
+}
+
+func (e *EmployeeRepository) Update(id int, employee models.Employee) error {
+    _, err := e.db.Exec("UPDATE employees SET name = $1, age = $2 WHERE id = $3", employee.Name, employee.Age, id)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+
+func (e *EmployeeRepository) Delete(id int) error {
+    _, err := e.db.Exec("DELETE FROM employees WHERE id = $1", id)
+    if err != nil {
+        return err
+    }
+    return nil
+}
+```
+
+**handlers/employee_handler.go**
+```go
+package handlers
+
+import (
+    "net/http"
+    "employees/models"
+    "employees/repositories"
+    "github.com/go-chi/chi/v5"
+    "github.com/htmx.org/htmx-go/v2"
+)
+
+type EmployeeHandler struct{}
+
+func (e *EmployeeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+    employeeRepository := repositories.NewEmployeeRepository(getDB())
+    employees, err := employeeRepository.GetAll()
+    if err != nil {
+        htmx.Error(w, http.StatusInternalServerError, err)
+        return
+    }
+    htmx.Render(w, "list.html", employees)
+}
+
+func (e *EmployeeHandler) Add(w http.ResponseWriter, r *http.Request) {
+    htmx.Render(w, "add.html", nil)
+}
+
+func (e *EmployeeHandler) Create(w http.ResponseWriter, r *http.Request) {
+    employee := models.Employee{}
+    err := htmx.Bind(w, r, &employee)
+    if err != nil {
+        htmx.Error(w, http.StatusBadRequest, err)
+        return
+    }
+    employeeRepository := repositories.NewEmployeeRepository(getDB())
+    err = employeeRepository.Create(employee)
+    if err != nil {
+        htmx.Error(w, http.StatusInternalServerError, err)
+        return
+    }
+    htmx.Redirect(w, r, "/")
+}
+
+func (e *EmployeeHandler) Edit(w http.ResponseWriter, r *http.Request) {
+    id := chi.URLParam(r, "id")
+    employeeRepository := repositories.NewEmployeeRepository(getDB())
+    employee, err := employeeRepository.Edit(id)
+    if err != nil {
+        htmx.Error(w, http.StatusNotFound, err)
+        return
+    }
+    htmx.Render(w, "edit.html", employee)
+}
+
+func (e *EmployeeHandler) Update(w http.ResponseWriter, r *http.Request) {
+    id := chi.URLParam(r, "id")
+    employee := models.Employee{}
+    err := htmx.Bind(w, r, &employee)
+    if err != nil {
+        htmx.Error(w, http.StatusBadRequest, err)
+        return
+    }
+    employeeRepository := repositories.NewEmployeeRepository(getDB())
+    err = employeeRepository.Update(id, employee)
+    if err != nil {
+        htmx.Error(w, http.StatusInternalServerError, err)
+        return
+    }
+    htmx.Redirect(w, r, "/")
+}
+
+func (e *EmployeeHandler) Delete(w http.ResponseWriter, r *http.Request) {
+    id := chi.URLParam(r, "id")
+    employeeRepository := repositories.NewEmployeeRepository(getDB())
+    err := employeeRepository.Delete(id)
+    if err != nil {
+        htmx.Error(w, http.StatusInternalServerError, err)
+        return
+    }
+    htmx.Redirect(w, r, "/")
+}
+
+func getDB() *sql.DB {
+    // Initialize and return a database connection
+}
+```
+
+**public/index.html**
 ```html
-<!-- layout.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Employees</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-	<nav>
-		<ul>
-			<li><a href="{{url "/employees"}}">Employees</a></li>
-		</ul>
-	</nav>
-	<div id="content">
-		{{block "content" .}}{{end}}
-	</div>
+    <h1>Employees</h1>
+    <a href="/add">Add New Employee</a>
+    <div hx-get="/"></div>
+    <script src="script.js"></script>
 </body>
 </html>
 ```
 
-We will define an `employees.html` template that includes a table with a list of employees.
-```html
-<!-- employees.html -->
-{{define "content"}}
-<h1>Employees</h1>
-<table>
-	<thead>
-		<tr>
-			<th>ID</th>
-			<th>Name</th>
-			<th>Age</th>
-		</tr>
-	</thead>
-	<tbody>
-		{{range .Employees}}
-		<tr>
-			<td>{{.ID}}</td>
-			<td>{{.Name}}</td>
-			<td>{{.Age}}</td>
-		</tr>
-		{{end}}
-	</tbody>
-</table>
-{{end}}
+**public/styles.css**
+```css
+body {
+    font-family: Arial, sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+}
 ```
 
-We will define an `index.html` template that includes a link to the `employees` page.
-```html
-<!-- index.html -->
-{{define "content"}}
-<h1>Home</h1>
-<p><a href="{{url "/employees"}}">View Employees</a></p>
-{{end}}
+**public/script.js**
+```javascript
+htmx.on("htmx:load", function(evt) {
+    console.log("htmx loaded");
+});
 ```
+
+This modern implementation uses Golang, Chi, HTMX, and Tailwind to provide a more scalable and maintainable solution. The application is structured around a clean architecture, with separate packages for handling requests, interacting with the database, and rendering templates. The use of HTMX provides a more dynamic and interactive user experience, while Tailwind is used for styling and layout.

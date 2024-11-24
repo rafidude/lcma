@@ -13,6 +13,7 @@ const groqBaseURL = "https://api.groq.com/openai/v1/chat/completions"
 // GroqClient handles communication with Groq API
 type GroqClient struct {
 	apiKey     string
+	maxTokens  int
 	httpClient *http.Client
 }
 
@@ -24,18 +25,19 @@ type GroqMessage struct {
 
 // GroqRequest represents the request structure for Groq API
 type GroqRequest struct {
-	Model    string        `json:"model"`
-	Messages []GroqMessage `json:"messages"`
+	Model     string        `json:"model"`
+	Messages  []GroqMessage `json:"messages"`
+	MaxTokens int           `json:"max_tokens,omitempty"`
 }
 
 // GroqResponse represents the response structure from Groq API
 type GroqResponse struct {
-	ID      string    `json:"id"`
-	Object  string    `json:"object"`
-	Created int64     `json:"created"`
-	Model   string    `json:"model"`
-	Choices []Choice  `json:"choices"`
-	Usage   Usage     `json:"usage"`
+	ID      string   `json:"id"`
+	Object  string   `json:"object"`
+	Created int64    `json:"created"`
+	Model   string   `json:"model"`
+	Choices []Choice `json:"choices"`
+	Usage   Usage    `json:"usage"`
 }
 
 type Choice struct {
@@ -58,6 +60,8 @@ type Usage struct {
 func NewGroqClient(apiKey string) *GroqClient {
 	return &GroqClient{
 		apiKey: apiKey,
+		// maxTokens: 32768,
+		maxTokens: 8000,
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -67,8 +71,9 @@ func NewGroqClient(apiKey string) *GroqClient {
 // CreateChatCompletion sends a chat completion request to Groq API
 func (c *GroqClient) CreateChatCompletion(model string, messages []GroqMessage) (*GroqResponse, error) {
 	reqBody := GroqRequest{
-		Model:    model,
-		Messages: messages,
+		Model:     model,
+		Messages:  messages,
+		MaxTokens: c.maxTokens,
 	}
 
 	jsonBody, err := json.Marshal(reqBody)

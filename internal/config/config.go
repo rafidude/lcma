@@ -16,6 +16,7 @@ var (
 	PromptTemplatePath string
 	OutputPath         string
 	ReportPath         string
+	ModernCodePath     string
 )
 
 // Init loads the environment variables and initializes the configuration
@@ -64,6 +65,11 @@ func Init() error {
 	ReportPath = os.Getenv("REPORT_PATH")
 	if ReportPath == "" {
 		return fmt.Errorf("REPORT_PATH not set in .env file")
+	}
+
+	ModernCodePath = os.Getenv("MODERN_CODE_PATH")
+	if ModernCodePath == "" {
+		return fmt.Errorf("MODERN_CODE_PATH not set in .env file")
 	}
 
 	return nil

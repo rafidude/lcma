@@ -26,6 +26,8 @@ Please provide the following information in Markdown format:
    - Code smells and anti-patterns
 
 3. Modern Implementation
+   Give the project file structure needs be output in the JSON format
+
    Please rewrite the application using the modern technology stack specified in the <moderntech_stack> tags, focusing on:
    - Modern best practices and design patterns
    - Improved security and error handling
@@ -34,4 +36,5 @@ Please provide the following information in Markdown format:
    - Type safety and input validation
    - Comprehensive testing strategy
    - Documentation and maintainability
+   - Make sure the whole code is provided for all the files with full implementation including the web frontend and db connection of the whole codebase.
 

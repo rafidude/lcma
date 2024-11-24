@@ -11,3 +11,13 @@ Features:
 - Risk assessment for each suggested modification
 - Generates boilerplate code for Golang Chi HTMX Tailwind based responsive web application
 
+## User would need to configure these configuration input in the .env file:
+GROQ_API_KEY=
+MODEL=llama-3.1-70b-versatile
+LEGACY_CODE_PATH=
+LEGACY_TECH_STACK=[]
+MODERN_TECH_STACK=[]
+PROMPT_TEMPLATE_PATH=./prompt.txt
+OUTPUT_PATH=./output.txt
+REPORT_PATH=./report.md
+MODERN_CODE_PATH=
